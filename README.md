@@ -192,7 +192,20 @@ $$A = P \left(1 + \frac{r}{n}\right)^{nt}$$
 - **t**: Number of years
 
 ### 2. Bond Interest (Coupon)
-The periodic interest payment a bondholder receives from the bond's issuance date until it matures.
+The periodic interest payment a bondholder receives from the bond's issuance date until it matures. Unlike compound interest, bond coupons are typically paid out (not reinvested automatically).
+
+**Practical Example:**
+- **Issuer:** BANCO FAMILIAR S.A.E.C.A.
+- **Principal:** 30,000,000 PYG (Approx. **$4,000 USD** at 7,500 PYG/USD)
+- **Annual Rate:** 9.00%
+
+$$C = \$4,000 \times 0.09 = \$360 \text{ per year}$$
+
+| Payment Period | Interest (USD) | Interest (PYG) |
+| :--- | :--- | :--- |
+| Quarterly | $90.00 | 675,000 PYG |
+| Semi-Annual | $180.00 | 1,350,000 PYG |
+| **Annual Total** | **$360.00** | **2,700,000 PYG** |
 
 $$C = F \times c$$
 
