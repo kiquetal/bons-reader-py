@@ -207,6 +207,17 @@ $$C = \$4,000 \times 0.1235 = \$494 \text{ per year}$$
 | Semi-Annual | $247.00 | 1,852,500 PYG |
 | **Annual Total** | **$494.00** | **3,705,000 PYG** |
 
+### 🥊 The 5-Year Showdown: Compound vs. Bond
+What happens if you hold both for 5 years with a **$4,000** initial capital?
+
+| Investment Type | Annual Rate | Total Interest (5yr) | Final Value |
+| :--- | :--- | :--- | :--- |
+| **Fondo Mutuo** (Compound) | 9.00% | $2,154.48 | $6,154.48 |
+| **Tape Ruvicha Bond** (Simple) | 12.35% | $2,470.00 | $6,470.00 |
+| **Delta (Difference)** | **+3.35%** | **$315.52** | **Bond wins!** |
+
+*Note: In the long run (15+ years), the power of compounding usually overtakes higher simple interest rates, but for shorter terms, the raw yield of high-rate bonds is often superior.*
+
 $$C = F \times c$$
 
 - **C**: Coupon payment amount
