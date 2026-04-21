@@ -34,6 +34,7 @@ Each emission can contain multiple series. The scraper flattens them so every se
 | `agente_colocador` | Familiar Casa de Bolsa S.A | Placement agent |
 | `series_count` | 3 | Total series in the emission |
 | `url` | https://...banco-familiar.../ | Detail page URL |
+| `scraped_at` | 2026-04-21T16:00:13Z | UTC timestamp of scrape execution |
 
 ## Pre-requisites
 
@@ -59,6 +60,7 @@ cp .env.example .env
 #   RESEND_API_KEY=re_xxxxxxxxxxxx
 #   EMAIL_FROM=onboarding@resend.dev
 #   EMAIL_TO=you@example.com
+#   MEMPALACE_BIN=/path/to/mempalace  (optional, for --local mode)
 ```
 
 ## Usage
