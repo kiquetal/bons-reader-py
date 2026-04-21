@@ -176,6 +176,34 @@ Go to Actions → BVA Emissions Scraper → Run workflow.
 6. **Email** — Send via Resend with full table and highlighted rows for bonds > 11%
 7. **MemPalace** *(local only)* — Ingest `data/` into mempalace for RAG search
 
+## Financial Formulas
+
+For academic reference, here are the formulas used to understand bond returns and interest accumulation.
+
+### 1. Compound Interest
+Used to calculate the total amount of an investment over time when interest is reinvested. In Paraguay, entities like **Cadiem** and **Investor** offer products like *Fondo Mutuo* that utilize compound interest by reinvesting daily yields.
+
+$$A = P \left(1 + \frac{r}{n}\right)^{nt}$$
+
+- **A**: Final amount (Principal + Interest)
+- **P**: Principal (Initial investment)
+- **r**: Annual interest rate (decimal)
+- **n**: Number of times interest is compounded per year
+- **t**: Number of years
+
+### 2. Bond Interest (Coupon)
+The periodic interest payment a bondholder receives from the bond's issuance date until it matures.
+
+$$C = F \times c$$
+
+- **C**: Coupon payment amount
+- **F**: Face value (Par value) of the bond
+- **c**: Coupon rate (Annual interest rate)
+
+### Visual Representation
+
+![Interest Growth](docs/interest-growth.png)
+
 ## License
 
 MIT
