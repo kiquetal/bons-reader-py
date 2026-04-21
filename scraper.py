@@ -2,6 +2,7 @@ import argparse
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -16,7 +17,7 @@ BASE = "https://www.bolsadevalores.com.py"
 LISTING_URL = f"{BASE}/nuevas-emisiones/"
 AJAX_URL = f"{BASE}/wp-admin/admin-ajax.php"
 INTEREST_THRESHOLD = 11.0
-MEMPALACE_PYTHON = "/mydata/codes/2026/mempalace/.venv/bin/python"
+MEMPALACE_BIN = shutil.which("mempalace")
 
 
 def get_detail_urls(n=30):
@@ -247,8 +248,11 @@ def send_email(entries):
 
 def ingest_mempalace():
     """Mine data/ into mempalace."""
+    if not MEMPALACE_BIN:
+        print("❌ mempalace not found in PATH", file=sys.stderr)
+        return
     data_dir = str(Path(__file__).parent / "data")
-    cmd = [MEMPALACE_PYTHON, "-m", "mempalace", "mine", data_dir, "--wing", "bva-emisiones"]
+    cmd = [MEMPALACE_BIN, "mine", data_dir, "--wing", "bva-emisiones"]
     print(f"🧠 Running: {' '.join(cmd)}")
     result = subprocess.run(cmd, capture_output=True, text=True)
     if result.returncode == 0:
