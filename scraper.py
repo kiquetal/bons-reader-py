@@ -1,4 +1,5 @@
 import argparse
+from datetime import datetime, timezone
 import json
 import os
 import re
@@ -252,7 +253,8 @@ def ingest_mempalace():
         print("❌ mempalace not found in PATH", file=sys.stderr)
         return
     data_dir = str(Path(__file__).parent)
-    cmd = [MEMPALACE_BIN, "mine", data_dir, "--wing", "bva-emisiones"]
+    cmd = [MEMPALACE_BIN, "mine", data_dir, "--wing", "bva-emisiones",
+           "--include-ignored", "data/emisiones.json"]
     print(f"🧠 Running: {' '.join(cmd)}")
     result = subprocess.run(cmd, capture_output=True, text=True)
     if result.returncode == 0:
@@ -283,6 +285,9 @@ def main():
     print(f"   Total series entries: {len(entries)}")
 
     # Save JSON
+    scraped_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    for e in entries:
+        e["scraped_at"] = scraped_at
     out = Path(__file__).parent / "data" / "emisiones.json"
     out.parent.mkdir(exist_ok=True)
     out.write_text(json.dumps(entries, indent=2, ensure_ascii=False))
