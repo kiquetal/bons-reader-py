@@ -1,15 +1,30 @@
-wing: bons_reader_py
+wing: bva-emisiones
 rooms:
-- name: documentation
-  description: Files from docs/
+- name: investment-offers
+  description: Bond emissions data — issuers, instruments, ISIN codes, placement agents
   keywords:
-  - documentation
-  - docs
-- name: data
-  description: Files from data/
+  - emisiones
+  - bonds
+  - issuer
+  - isin
+  - instrument
+- name: yield-rates
+  description: Interest rates and durations for bond series
   keywords:
-  - data
-  - data
-- name: general
-  description: Files that don't fit other rooms
-  keywords: []
+  - percentage
+  - rate
+  - duration
+  - high-yield
+- name: risk-ratings
+  description: Risk qualifications and issuer categories
+  keywords:
+  - qualification
+  - rating
+  - AApy
+  - estable
+- name: schedule
+  description: Scraper execution schedule and date formats
+  keywords:
+  - schedule
+  - date
+  - wednesday
