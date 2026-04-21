@@ -1,0 +1,15 @@
+wing: bons_reader_py
+rooms:
+- name: documentation
+  description: Files from docs/
+  keywords:
+  - documentation
+  - docs
+- name: data
+  description: Files from data/
+  keywords:
+  - data
+  - data
+- name: general
+  description: Files that don't fit other rooms
+  keywords: []
