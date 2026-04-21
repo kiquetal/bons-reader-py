@@ -2,7 +2,7 @@ name: BVA Emissions Scraper
 
 on:
   schedule:
-    - cron: '0 12 * * 3'  # Every Wednesday at noon UTC (~8am Paraguay)
+    - cron: '0 12 * * 2,4'  # Every Tuesday and Thursday at noon UTC (~8am Paraguay)
   workflow_dispatch:
 
 jobs:
