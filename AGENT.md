@@ -38,9 +38,9 @@ When answering questions about this data:
 
 ### Room: execution-log
 
-Last execution: check `data/emisiones.json` modification date for the most recent scrape.
 Schedule: every Wednesday at 12:00 UTC (~08:00 PYT).
 Output location: `data/emisiones.json`
+To check the last execution date, look at the modification timestamp of `data/emisiones.json`.
 
 ### Room: useful-queries
 
