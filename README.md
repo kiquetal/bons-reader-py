@@ -202,7 +202,7 @@ $$C = F \times c$$
 
 ### Visual Representation
 
-![Interest Growth](./docs/compound-interest-chart.png)
+![Compound Interest Growth ($1,000 at 9% Annual)](./docs/compound-interest-chart.png)
 
 ## License
 
