@@ -202,7 +202,7 @@ $$C = F \times c$$
 
 ### Visual Representation
 
-![Interest Growth](docs/interest-growth.png)
+![Interest Growth](docs/compound-interest-chart.png)
 
 ## License
 
