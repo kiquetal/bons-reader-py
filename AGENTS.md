@@ -22,6 +22,12 @@ Common issuers: banks (Banco Familiar, Banco Continental, Sudameris), financiera
 
 ### Room: schedule
 
-Scraper runs every Wednesday at 12:00 UTC (~08:00 PYT).
+Scraper runs every Tuesday and Thursday at 12:00 UTC (~08:00 PYT).
 Output: `data/emisiones.json`. Check its modification date for last execution.
 Dates in the data are in Spanish: Lun, Mar, Mié, Jue, Vie, Sáb, Dom.
+
+### Room: finished-tasks
+
+- Updated scraper schedule from Wednesday to Tuesday and Thursday (cron: `0 12 * * 2,4`).
+- Added `environment` to the scraper GitHub Actions workflow.
+- Included date in the email subject for better traceability.
