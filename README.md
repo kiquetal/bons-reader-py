@@ -85,6 +85,46 @@ The email includes:
 
 Columns: Nombre, Instrumento, Calificación, Tasa, Fecha, Plazo, ISIN, Agente Colocador.
 
+## Testing Email Locally
+
+1. Create a free account at [resend.com](https://resend.com) and grab your API key.
+2. Copy and edit the env file:
+   ```bash
+   cp .env.example .env
+   ```
+3. Fill in your values:
+   ```
+   RESEND_API_KEY=re_your_actual_key
+   EMAIL_FROM=onboarding@resend.dev
+   EMAIL_TO=your-email@example.com
+   ```
+   > **Note:** If you haven't verified a custom domain in Resend, use `onboarding@resend.dev` as the sender. In that case, `EMAIL_TO` must match your Resend account email.
+
+4. Run the scraper with email enabled:
+   ```bash
+   .venv/bin/python scraper.py
+   ```
+5. To test scraping without sending email:
+   ```bash
+   .venv/bin/python scraper.py --no-email
+   ```
+
+## MemPalace Integration
+
+[MemPalace](https://github.com/MemPalace/mempalace) is a local-first AI memory system that stores content as verbatim text and retrieves it via semantic search. It organizes data into *wings* (projects), *rooms* (topics), and *drawers* (content) — all indexed locally with no API calls required.
+
+When you run the scraper with `--local`, it automatically ingests the scraped emissions into MemPalace so you can later query them with natural language, e.g.:
+
+```bash
+# After running the scraper with --local
+/mydata/codes/2026/mempalace/.venv/bin/mempalace search "bonds with high interest rate"
+```
+
+This requires MemPalace installed at `/mydata/codes/2026/mempalace/`. The scraper calls:
+```bash
+/mydata/codes/2026/mempalace/.venv/bin/python -m mempalace mine data/ --wing bva-emisiones
+```
+
 ## GitHub Actions
 
 The workflow runs every Wednesday at 12:00 UTC (~8am Paraguay time) and can also be triggered manually.
