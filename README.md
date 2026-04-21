@@ -1,0 +1,138 @@
+# 📊 BVA Emissions Scraper
+
+Scrapes the latest bond emissions from [Bolsa de Valores de Asunción](https://www.bolsadevalores.com.py/nuevas-emisiones/) (Paraguay), flattens multi-series emissions into individual entries, and sends email alerts when bonds exceed a configurable interest rate threshold.
+
+## Architecture
+
+![Architecture](docs/architecture.png)
+
+The scraper fetches the listing page, handles AJAX pagination (JetEngine "Cargar más"), visits each detail page, and extracts per-series data into a flat JSON structure.
+
+## Execution Environments
+
+![Environments](docs/environments.png)
+
+Runs locally with optional [MemPalace](https://github.com/MemPalace/mempalace) RAG ingestion, or on GitHub Actions every Wednesday.
+
+## Data Model
+
+![Data Model](docs/data-model.png)
+
+Each emission can contain multiple series. The scraper flattens them so every series is its own JSON entry with the parent emission's metadata.
+
+### JSON Output Fields
+
+| Field | Example | Description |
+|---|---|---|
+| `name` | BANCO FAMILIAR S.A.E.C.A. | Issuer name |
+| `instrument` | bono | Instrument type |
+| `qualification` | AApy Estable. | Risk rating |
+| `percentage` | 5,65% | Interest rate |
+| `date` | Jue, abril 23, 2026 | Emission date |
+| `duration` | 732 | Term in days |
+| `isin` | PYFAM03F0006 | ISIN code |
+| `agente_colocador` | Familiar Casa de Bolsa S.A | Placement agent |
+| `series_count` | 3 | Total series in the emission |
+| `url` | https://...banco-familiar.../ | Detail page URL |
+
+## Pre-requisites
+
+- **Python 3.9+**
+- **pip** (comes with Python)
+- A [Resend](https://resend.com) account and API key (for email alerts)
+- *(Optional)* [MemPalace](https://github.com/MemPalace/mempalace) installed at `/mydata/codes/2026/mempalace/` for local RAG ingestion
+
+## Setup
+
+```bash
+# 1. Clone the repo
+git clone <repo-url> && cd bons-reader-py
+
+# 2. Create virtual environment and install dependencies
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+
+# 3. Configure environment variables
+cp .env.example .env
+# Edit .env with your values:
+#   RESEND_API_KEY=re_xxxxxxxxxxxx
+#   EMAIL_FROM=onboarding@resend.dev
+#   EMAIL_TO=you@example.com
+```
+
+## Usage
+
+```bash
+# Full run: scrape + save JSON + send email
+.venv/bin/python scraper.py
+
+# Scrape only, no email (for testing)
+.venv/bin/python scraper.py --no-email
+
+# Local run with MemPalace ingestion
+.venv/bin/python scraper.py --local
+```
+
+Output is saved to `data/emisiones.json`.
+
+## Email Alert
+
+The email includes:
+- **Summary** — total series count and how many exceed the interest threshold (default: 11%)
+- **Highlighted bonds** — listed at the top with ⚠️ warning
+- **Full table** — all series with rows above threshold highlighted in yellow
+
+Columns: Nombre, Instrumento, Calificación, Tasa, Fecha, Plazo, ISIN, Agente Colocador.
+
+## GitHub Actions
+
+The workflow runs every Wednesday at 12:00 UTC (~8am Paraguay time) and can also be triggered manually.
+
+### Required Secrets
+
+Add these in your repo → Settings → Secrets and variables → Actions:
+
+| Secret | Description |
+|---|---|
+| `RESEND_API_KEY` | Your Resend API key |
+| `EMAIL_FROM` | Sender email (e.g. `alerts@yourdomain.com`) |
+| `EMAIL_TO` | Recipient(s), comma-separated |
+
+### Manual Trigger
+
+Go to Actions → BVA Emissions Scraper → Run workflow.
+
+## Project Structure
+
+```
+.
+├── scraper.py                          # Main script
+├── requirements.txt                    # Python dependencies
+├── .env.example                        # Environment variables template
+├── .gitignore
+├── data/
+│   ├── .gitkeep
+│   └── emisiones.json                  # Output (git-ignored)
+├── docs/
+│   ├── architecture.png
+│   ├── environments.png
+│   └── data-model.png
+├── .github/workflows/bva-scraper.yml   # GitHub Actions workflow
+├── PLAN.md                             # Implementation plan
+└── README.md
+```
+
+## How It Works
+
+1. **Fetch listing page** — GET `/nuevas-emisiones/`, extract detail URLs from `data-url` attributes
+2. **AJAX pagination** — POST to `admin-ajax.php` with JetEngine params and signature to load more entries beyond the initial 12
+3. **Parse detail pages** — For each emission, extract name, instrument, qualification, date, and per-series: ISIN, interest rate, duration, placement agent
+4. **Flatten** — Each series becomes its own JSON entry with parent emission metadata
+5. **Save** — Write to `data/emisiones.json`
+6. **Email** — Send via Resend with full table and highlighted rows for bonds > 11%
+7. **MemPalace** *(local only)* — Ingest `data/` into mempalace for RAG search
+
+## License
+
+MIT
