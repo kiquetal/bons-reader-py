@@ -12,7 +12,7 @@ The scraper fetches the listing page, handles AJAX pagination (JetEngine "Cargar
 
 ![Environments](docs/environments.png)
 
-Runs locally with optional [MemPalace](https://github.com/MemPalace/mempalace) RAG ingestion, or on GitHub Actions every Wednesday.
+Runs locally with optional [MemPalace](https://github.com/MemPalace/mempalace) RAG ingestion, or on GitHub Actions every Tuesday and Thursday.
 
 ## Data Model
 
@@ -129,7 +129,7 @@ mempalace mine data/ --wing bva-emisiones
 
 ## GitHub Actions
 
-The workflow runs every Wednesday at 12:00 UTC (~8am Paraguay time) and can also be triggered manually.
+The workflow runs every Tuesday and Thursday at 12:00 UTC (~8am Paraguay time) and can also be triggered manually.
 
 ### Required Secrets
 
