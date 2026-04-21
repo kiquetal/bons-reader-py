@@ -234,7 +234,8 @@ def send_email(entries):
 
     resend.api_key = api_key
     high_count = sum(1 for e in entries if parse_percentage(e["percentage"]) > INTEREST_THRESHOLD)
-    subject = f"BVA Emisiones: {len(entries)} series"
+    now_str = datetime.now().strftime("%Y-%m-%d")
+    subject = f"BVA Emisiones [{now_str}]: {len(entries)} series"
     if high_count:
         subject += f" — ⚠️ {high_count} con tasa >{INTEREST_THRESHOLD}%"
 
