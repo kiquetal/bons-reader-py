@@ -1,4 +1,5 @@
 import argparse
+from datetime import datetime, timezone
 import json
 import os
 import re
@@ -261,6 +262,31 @@ def ingest_mempalace():
         print(f"❌ MemPalace error: {result.stderr}", file=sys.stderr)
 
 
+def update_agent_md(entries):
+    """Update AGENT.md execution-log with timestamp and summary."""
+    agent_path = Path(__file__).parent / "AGENT.md"
+    if not agent_path.exists():
+        return
+    now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    high = sum(1 for e in entries if parse_percentage(e["percentage"]) > INTEREST_THRESHOLD)
+    new_log = (
+        f"### Room: execution-log\n\n"
+        f"Last execution: {now}\n"
+        f"Series scraped: {len(entries)}\n"
+        f"High-yield bonds (>{INTEREST_THRESHOLD}%): {high}\n"
+        f"Schedule: every Wednesday at 12:00 UTC (~08:00 PYT).\n"
+        f"Output location: `data/emisiones.json`"
+    )
+    text = agent_path.read_text()
+    text = re.sub(
+        r"### Room: execution-log\n\n.*?(?=\n### |\Z)",
+        new_log,
+        text,
+        flags=re.DOTALL,
+    )
+    agent_path.write_text(text)
+
+
 def main():
     parser = argparse.ArgumentParser(description="BVA Emissions Scraper")
     parser.add_argument("--local", action="store_true", help="Also ingest into mempalace")
@@ -287,6 +313,8 @@ def main():
     out.parent.mkdir(exist_ok=True)
     out.write_text(json.dumps(entries, indent=2, ensure_ascii=False))
     print(f"💾 Saved to {out}")
+
+    update_agent_md(entries)
 
     # Email
     if not args.no_email:
