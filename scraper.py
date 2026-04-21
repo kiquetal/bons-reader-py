@@ -17,7 +17,7 @@ BASE = "https://www.bolsadevalores.com.py"
 LISTING_URL = f"{BASE}/nuevas-emisiones/"
 AJAX_URL = f"{BASE}/wp-admin/admin-ajax.php"
 INTEREST_THRESHOLD = 11.0
-MEMPALACE_BIN = shutil.which("mempalace")
+MEMPALACE_BIN = os.getenv("MEMPALACE_BIN") or shutil.which("mempalace")
 
 
 def get_detail_urls(n=30):
@@ -251,7 +251,7 @@ def ingest_mempalace():
     if not MEMPALACE_BIN:
         print("❌ mempalace not found in PATH", file=sys.stderr)
         return
-    data_dir = str(Path(__file__).parent / "data")
+    data_dir = str(Path(__file__).parent)
     cmd = [MEMPALACE_BIN, "mine", data_dir, "--wing", "bva-emisiones"]
     print(f"🧠 Running: {' '.join(cmd)}")
     result = subprocess.run(cmd, capture_output=True, text=True)
