@@ -150,7 +150,7 @@ Go to Actions → BVA Emissions Scraper → Run workflow.
 ├── scraper.py                          # Main script
 ├── requirements.txt                    # Python dependencies
 ├── .env.example                        # Environment variables template
-├── AGENT.md                            # LLM/MemPalace context file
+├── AGENTS.md                           # LLM/MemPalace context file
 ├── .gitignore
 ├── data/
 │   ├── .gitkeep
