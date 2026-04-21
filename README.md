@@ -40,7 +40,7 @@ Each emission can contain multiple series. The scraper flattens them so every se
 - **Python 3.9+**
 - **pip** (comes with Python)
 - A [Resend](https://resend.com) account and API key (for email alerts)
-- *(Optional)* [MemPalace](https://github.com/MemPalace/mempalace) installed at `/mydata/codes/2026/mempalace/` for local RAG ingestion
+- *(Optional)* [MemPalace](https://github.com/MemPalace/mempalace) installed locally for RAG ingestion
 
 ## Setup
 
@@ -117,12 +117,12 @@ When you run the scraper with `--local`, it automatically ingests the scraped em
 
 ```bash
 # After running the scraper with --local
-/mydata/codes/2026/mempalace/.venv/bin/mempalace search "bonds with high interest rate"
+mempalace search "bonds with high interest rate"
 ```
 
-This requires MemPalace installed at `/mydata/codes/2026/mempalace/`. The scraper calls:
+The scraper calls:
 ```bash
-/mydata/codes/2026/mempalace/.venv/bin/python -m mempalace mine data/ --wing bva-emisiones
+mempalace mine data/ --wing bva-emisiones
 ```
 
 ## GitHub Actions
