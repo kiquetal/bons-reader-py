@@ -122,10 +122,13 @@ When you run the scraper with `--local`, it automatically ingests the scraped em
 mempalace search "bonds with high interest rate"
 ```
 
-The scraper calls:
+The scraper calls `mempalace mine` automatically. If you want to manually ingest an updated `data/emisiones.json`, use:
+
 ```bash
-mempalace mine data/ --wing bva-emisiones
+./ingest-mempalace.sh
 ```
+
+This script reads your local `MEMPALACE_BIN` from the `.env` file.
 
 ## GitHub Actions
 
