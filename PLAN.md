@@ -1,7 +1,7 @@
 # BVA Emissions Scraper - Implementation Plan
 
 ## Problem Statement
-Scrape the first 20 new emissions from Bolsa de Valores de Asunción (Paraguay), flatten each series into individual JSON entries with key fields (name, instrument, qualification, percentage, date, duration), send a daily email via Resend with all bonds listed and >11% interest ones highlighted, and optionally ingest into mempalace when running locally.
+Scrape the first 20 new emissions from Bolsa de Valores de Asunción (Paraguay), flatten each series into individual JSON entries with key fields (name, instrument, qualification, percentage, date, duration), send a bi-weekly email (Tue/Thu) via Resend with all bonds listed and >11% interest ones highlighted, and optionally ingest into mempalace when running locally.
 
 ## Requirements
 - Scrape listing page + detail pages to get first 30 emissions
