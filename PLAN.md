@@ -19,7 +19,7 @@ Scrape the first 20 new emissions from Bolsa de Valores de Asunción (Paraguay),
 - The listing page at `/nuevas-emisiones/` shows ~12 cards initially with a "Cargar más" AJAX button. Each card links to a detail page.
 - Detail pages contain: emission name (h2), instrument, calificación de riesgo, fecha de emisión, and per-series data (tasa de interés, plazo de vencimiento, etc.)
 - The "Cargar más" button likely uses WordPress AJAX. We need 20 entries but only 12 show initially, so we must handle load-more (try `/page/2/` WordPress pattern or simulate AJAX call).
-- MemPalace ingestion: save JSON to a directory, then run `mempalace mine <dir> --wing bva-emisiones`
+- MemPalace ingestion: save JSON to a directory, then run `mempalace mine . --wing bva-emisiones --include-ignored data/emisiones.json`
 - MemPalace must be installed and available in PATH
 
 ## Architecture
@@ -36,7 +36,7 @@ flowchart TD
     G -->|No| H2[Send email: full list, no highlights]
     H --> I{--local flag?}
     H2 --> I
-    I -->|Yes| J[mempalace mine data/]
+    I -->|Yes| J[mempalace mine .]
     I -->|No| K[Done]
     J --> K
 ```
@@ -92,7 +92,7 @@ flowchart TD
 - **Objective:** When `--local` flag is passed, after saving JSON, ingest into mempalace using the mempalace venv.
 - **Implementation:** Use `subprocess.run()` to call:
   ```bash
-  mempalace mine data/ --wing bva-emisiones
+  mempalace mine . --wing bva-emisiones --include-ignored data/emisiones.json
   ```
 - **Test:** Run `python scraper.py --local`, verify mempalace ingests the data.
 - **Demo:** Data appears in mempalace search results via `mempalace search "emisiones"`.

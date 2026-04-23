@@ -17,5 +17,5 @@ if [ ! -f "$JSON" ]; then
 fi
 
 echo "🚀 Ingestando en MemPalace..."
-$BIN mine "$JSON" --wing bva-emisiones --room investment-offers
+$BIN mine . --wing bva-emisiones --include-ignored "$JSON"
 echo "✅ ¡Listo!"
