@@ -246,4 +246,4 @@ $$C = F \times c$$
 
 ## License
 
-MIT
+Made in 2026
