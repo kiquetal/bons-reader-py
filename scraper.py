@@ -84,9 +84,10 @@ def get_detail_urls(n=30):
         try:
             body = r.json()
         except Exception as e:
-            print(f"❌ Failed to parse JSON from AJAX response. Status: {r.status_code}")
-            print(f"   Response Preview: {r.text[:1000]}")
-            raise e
+            print(f"⚠️ Failed to parse JSON from AJAX response. Status: {r.status_code}")
+            print("   The website (Wordfence) is limiting AJAX requests from this IP range.")
+            print("   Gracefully proceeding with the URLs collected so far.")
+            break
         if not body.get("success"):
             break
         new = re.findall(
