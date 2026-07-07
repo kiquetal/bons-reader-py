@@ -17,13 +17,20 @@ load_dotenv()
 BASE = "https://www.bolsadevalores.com.py"
 LISTING_URL = f"{BASE}/nuevas-emisiones/"
 AJAX_URL = f"{BASE}/wp-admin/admin-ajax.php"
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+    "Accept-Language": "es-419,es;q=0.9,en;q=0.8",
+    "Cache-Control": "no-cache",
+    "Pragma": "no-cache",
+}
 INTEREST_THRESHOLD = 11.0
 MEMPALACE_BIN = os.getenv("MEMPALACE_BIN") or shutil.which("mempalace")
 
 
 def get_detail_urls(n=30):
     """Scrape listing page + AJAX load-more to collect up to n detail URLs."""
-    resp = requests.get(LISTING_URL, timeout=30)
+    resp = requests.get(LISTING_URL, headers=HEADERS, timeout=30)
     resp.raise_for_status()
     html = resp.text
 
@@ -70,7 +77,7 @@ def get_detail_urls(n=30):
             "widget_settings[load_more_id]": "loadmore",
             "widget_settings[load_more_type]": "click",
         }
-        r = requests.post(AJAX_URL, data=data, timeout=30)
+        r = requests.post(AJAX_URL, data=data, headers=HEADERS, timeout=30)
         body = r.json()
         if not body.get("success"):
             break
@@ -106,7 +113,7 @@ def parse_duration(text):
 
 def parse_emission(url):
     """Fetch a detail page and return a list of dicts, one per series."""
-    resp = requests.get(url, timeout=30)
+    resp = requests.get(url, headers=HEADERS, timeout=30)
     resp.raise_for_status()
     soup = BeautifulSoup(resp.text, "html.parser")
 

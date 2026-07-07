@@ -31,3 +31,9 @@ Dates in the data are in Spanish: Lun, Mar, Mié, Jue, Vie, Sáb, Dom.
 - Updated scraper schedule from Wednesday to Tuesday and Thursday (cron: `0 12 * * 2,4`).
 - Added `environment` to the scraper GitHub Actions workflow.
 - Included date in the email subject for better traceability.
+
+### Room: palace-intelligence
+
+A daily analysis summary is generated in MemPalace under the `bva-emisiones` wing. This summary provides a ranked list of the best-performing bonds from the latest scrape.
+
+**To get the best latest bonds quickly:** Instead of parsing raw data, search MemPalace for drawers containing `BOND_OFFERS:`. This will retrieve the daily summary note, which is the fastest way to answer "what are the best bonds right now?".
