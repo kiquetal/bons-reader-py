@@ -77,6 +77,7 @@ def get_detail_urls(n=30):
             "widget_settings[use_load_more]": "yes",
             "widget_settings[load_more_id]": "loadmore",
             "widget_settings[load_more_type]": "click",
+        }
         r = session.post(AJAX_URL, data=data, timeout=30)
         try:
             body = r.json()
