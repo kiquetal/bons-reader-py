@@ -24,6 +24,8 @@ session.headers.update({
     "Accept-Language": "es-419,es;q=0.9,en;q=0.8",
     "Cache-Control": "no-cache",
     "Pragma": "no-cache",
+    "Referer": LISTING_URL,
+    "X-Requested-With": "XMLHttpRequest",
 })
 INTEREST_THRESHOLD = 11.0
 MEMPALACE_BIN = os.getenv("MEMPALACE_BIN") or shutil.which("mempalace")
