@@ -1,0 +1,36 @@
+name: Keep-Alive
+
+# Prevents GitHub from auto-disabling scheduled workflows after 60 days of
+# repository inactivity. Scheduled runs do NOT count as activity — only commits
+# do — so this job pushes a small timestamp commit once a month.
+
+on:
+  schedule:
+    - cron: '0 6 1 * *'   # 06:00 UTC on the 1st of every month
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Update keep-alive timestamp
+        run: |
+          mkdir -p .github
+          date -u +"%Y-%m-%dT%H:%M:%SZ" > .github/last-keepalive.txt
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/last-keepalive.txt
+          if git diff --staged --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "chore: keep-alive $(date -u +%Y-%m-%d) [skip ci]"
+            git push
+          fi
