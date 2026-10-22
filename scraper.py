@@ -31,16 +31,30 @@ INTEREST_THRESHOLD = 11.0
 MEMPALACE_BIN = os.getenv("MEMPALACE_BIN") or shutil.which("mempalace")
 
 
+def extract_detail_urls(html):
+    """Extract emission detail URLs, handling both absolute and relative
+    data-url values. The site switched from absolute URLs to relative
+    paths (e.g. data-url="/nuevas-emisiones/..."), so normalize to absolute."""
+    raw = re.findall(
+        r'data-url="((?:https://www\.bolsadevalores\.com\.py)?/nuevas-emisiones/[^"]+)"',
+        html,
+    )
+    normalized = []
+    for u in raw:
+        if u.startswith("/"):
+            u = BASE + u
+        normalized.append(u)
+    return normalized
+
+
 def get_detail_urls(n=30):
     """Scrape listing page + AJAX load-more to collect up to n detail URLs."""
     resp = session.get(LISTING_URL, timeout=30)
     resp.raise_for_status()
+    resp.encoding = resp.apparent_encoding or "utf-8"
     html = resp.text
 
-    urls = re.findall(
-        r'data-url="(https://www\.bolsadevalores\.com\.py/nuevas-emisiones/[^"]+)"',
-        html,
-    )
+    urls = extract_detail_urls(html)
     seen = set()
     urls = [u for u in urls if not (u in seen or seen.add(u))]
 
@@ -90,10 +104,7 @@ def get_detail_urls(n=30):
             break
         if not body.get("success"):
             break
-        new = re.findall(
-            r'data-url="(https://www\.bolsadevalores\.com\.py/nuevas-emisiones/[^"]+)"',
-            body["data"]["html"],
-        )
+        new = extract_detail_urls(body["data"]["html"])
         if not new:
             break
         for u in new:
@@ -120,10 +131,59 @@ def parse_duration(text):
     return int(m.group()) if m else 0
 
 
+SPANISH_MONTHS = {
+    "enero": 1, "febrero": 2, "marzo": 3, "abril": 4, "mayo": 5, "junio": 6,
+    "julio": 7, "agosto": 8, "septiembre": 9, "setiembre": 9, "octubre": 10,
+    "noviembre": 11, "diciembre": 12,
+}
+
+
+def parse_spanish_date(text):
+    """Parse a Spanish date into a datetime.date. Handles both:
+      - 'Mié, septiembre 30, 2026'   (emission date format)
+      - 'viernes, 30 de septiembre de 2033.'  (maturity date format)
+    Returns None if it can't be parsed."""
+    if not text:
+        return None
+    t = text.lower().strip().rstrip(".")
+    month = None
+    for name, num in SPANISH_MONTHS.items():
+        if name in t:
+            month = num
+            break
+    if month is None:
+        return None
+    nums = re.findall(r"\d+", t)
+    # Expect a day (1-2 digits) and a 4-digit year somewhere in the string.
+    day = year = None
+    for n in nums:
+        if len(n) == 4:
+            year = int(n)
+        elif 1 <= int(n) <= 31 and day is None:
+            day = int(n)
+    if day is None or year is None:
+        return None
+    try:
+        from datetime import date
+        return date(year, month, day)
+    except ValueError:
+        return None
+
+
+def days_between(emission_raw, maturity_raw):
+    """Days from emission date to maturity date, or 0 if either is unparseable."""
+    start = parse_spanish_date(emission_raw)
+    end = parse_spanish_date(maturity_raw)
+    if start and end and end > start:
+        return (end - start).days
+    return 0
+
+
 def parse_emission(url):
     """Fetch a detail page and return a list of dicts, one per series."""
     resp = session.get(url, timeout=30)
     resp.raise_for_status()
+    resp.encoding = resp.apparent_encoding or "utf-8"
     soup = BeautifulSoup(resp.text, "html.parser")
 
     # Build h2 label->value map: value is the next element's text
@@ -164,6 +224,8 @@ def parse_emission(url):
             current["percentage"] = val
         elif "plazo de vencimiento" in label:
             current["duration"] = val
+        elif "fecha de vencimiento" in label:
+            current["maturity"] = val
         elif "observación" in label:
             nxt_sib = h3.find_next_sibling()
             obs = nxt_sib.get_text(strip=True) if nxt_sib else ""
@@ -181,17 +243,26 @@ def parse_emission(url):
     if not series_data:
         return [{
             "name": name, "instrument": instrument, "qualification": qualification,
-            "percentage": "", "date": date_raw, "duration": 0,
+            "percentage": "", "date": date_raw, "duration": 0, "maturity": "",
             "isin": "", "agente_colocador": "", "series_count": 0, "url": url,
         }]
 
-    return [{
-        "name": name, "instrument": instrument, "qualification": qualification,
-        "percentage": s.get("percentage", ""), "date": date_raw,
-        "duration": parse_duration(s.get("duration", "")),
-        "isin": s.get("isin", ""), "agente_colocador": s.get("agente_colocador", ""),
-        "series_count": series_count, "url": url,
-    } for s in series_data]
+    def build_series(s):
+        maturity_raw = s.get("maturity", "")
+        duration = parse_duration(s.get("duration", ""))
+        # Plazo de Vencimiento is no longer published by BVA for many emissions;
+        # fall back to computing the term in days from the maturity date.
+        if not duration:
+            duration = days_between(date_raw, maturity_raw)
+        return {
+            "name": name, "instrument": instrument, "qualification": qualification,
+            "percentage": s.get("percentage", ""), "date": date_raw,
+            "duration": duration, "maturity": maturity_raw,
+            "isin": s.get("isin", ""), "agente_colocador": s.get("agente_colocador", ""),
+            "series_count": series_count, "url": url,
+        }
+
+    return [build_series(s) for s in series_data]
 
 
 def build_email_html(entries):
@@ -212,6 +283,7 @@ def build_email_html(entries):
             <td style="padding:8px;border:1px solid #ddd;">{e['percentage']}</td>
             <td style="padding:8px;border:1px solid #ddd;">{e['date']}</td>
             <td style="padding:8px;border:1px solid #ddd;">{e['duration']} días</td>
+            <td style="padding:8px;border:1px solid #ddd;">{e.get('maturity','')}</td>
             <td style="padding:8px;border:1px solid #ddd;">{e.get('isin','')}</td>
             <td style="padding:8px;border:1px solid #ddd;">{e.get('agente_colocador','')}</td>
         </tr>"""
@@ -228,6 +300,7 @@ def build_email_html(entries):
         <th style="padding:8px;border:1px solid #ddd;">Tasa</th>
         <th style="padding:8px;border:1px solid #ddd;">Fecha</th>
         <th style="padding:8px;border:1px solid #ddd;">Plazo</th>
+        <th style="padding:8px;border:1px solid #ddd;">Vencimiento</th>
         <th style="padding:8px;border:1px solid #ddd;">ISIN</th>
         <th style="padding:8px;border:1px solid #ddd;">Agente Colocador</th>
     </tr>
